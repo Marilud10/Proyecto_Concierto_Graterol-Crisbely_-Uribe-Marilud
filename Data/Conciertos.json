@@ -1,0 +1,77 @@
+
+[
+    {
+        "id": 1,
+        "nombre": "Luna Rosada",
+        "artista": "Luna Rosada",
+        "fecha": "2026-08-15",
+        "ciudad": "Bogotá",
+        "categoria": "Pop",
+        "precio": 850,
+        "imagen": "img/concierto.jpg",
+        "publicado": true,
+        "vendido": false
+    },
+    {
+        "id": 2,
+        "nombre": "Noctámbulos",
+        "artista": "Noctámbulos",
+        "fecha": "2026-08-20",
+        "ciudad": "Medellín",
+        "categoria": "Electrónica",
+        "precio": 1200,
+        "imagen": "img/noctambulos.jpg",
+        "publicado": true,
+        "vendido": false
+    },
+    {
+        "id": 3,
+        "nombre": "El Cuarteto Azul",
+        "artista": "El Cuarteto Azul",
+        "fecha": "2026-09-02",
+        "ciudad": "Cali",
+        "categoria": "Jazz",
+        "precio": 620,
+        "imagen": "img/cuarteto.jpg",
+        "publicado": true,
+        "vendido": false
+    },
+    {
+        "id": 4,
+        "nombre": "Marejada",
+        "artista": "Marejada",
+        "fecha": "2026-09-12",
+        "ciudad": "Barranquilla",
+        "categoria": "Rock",
+        "precio": 780,
+        "imagen": "img/marejada.jpg",
+        "publicado": true,
+        "vendido": false
+    },
+    {
+        "id": 5,
+        "nombre": "Flor de Tierra",
+        "artista": "Flor de Tierra",
+        "fecha": "2026-09-18",
+        "ciudad": "Cartagena",
+        "categoria": "Pop",
+        "precio": 450,
+        "imagen": "img/flor.jpg",
+        "publicado": true,
+        "vendido": false
+    },
+    {
+        "id": 6,
+        "nombre": "Cuerdas del Alma",
+        "artista": "Cuerdas del Alma",
+        "fecha": "2026-10-01",
+        "ciudad": "Bogotá",
+        "categoria": "Clásica",
+        "precio": 950,
+        "imagen": "img/cuerdas.jpg",
+        "publicado": true,
+        "vendido": false
+    }
+]
+
+

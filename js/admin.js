@@ -1,3 +1,119 @@
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        cargarCiudades();
+        pintarEventos();
+        actualizarDashboard();
+
+    }
+);
+
+
+function mostrarEventosCliente() {
+
+    const contenedor =
+        document.querySelector(
+            ".contenedor-cards"
+        );
+
+    if (!contenedor) {
+        return;
+    }
+
+    const eventos =
+        JSON.parse(
+            localStorage.getItem(
+                "eventos"
+            )
+        ) || [];
+
+    contenedor.innerHTML = "";
+
+    eventos.forEach((evento) => {
+
+        contenedor.innerHTML += `
+
+            <div class="card">
+
+                <img
+                    src="${evento.imagen}"
+                    alt="${evento.nombre}"
+                >
+
+                <div class="contenido">
+
+                    <span>
+                        ${evento.categoria}
+                    </span>
+
+                    <h3>
+                        ${evento.nombre}
+                    </h3>
+
+                    <p>
+                        🎤 ${evento.artista}
+                    </p>
+
+                    <p>
+                        📍 ${evento.ciudad}
+                    </p>
+
+                    <p>
+                        📅 ${evento.fecha}
+                    </p>
+
+                    <h4>
+                        $${evento.precio}
+                    </h4>
+
+                        <button>
+                            Comprar
+                        </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+
+async function cargarEventosIniciales() {
+
+    let eventos =
+        JSON.parse(
+            localStorage.getItem("eventos")
+        );
+
+    if (eventos) {
+        mostrarEventosCliente();
+        return;
+    }
+
+    const respuesta =
+        await fetch(
+            "eventos.json"
+        );
+
+    const datos =
+        await respuesta.json();
+
+    localStorage.setItem(
+        "eventos",
+        JSON.stringify(datos)
+    );
+
+    mostrarEventosCliente();
+}
+
+cargarEventosIniciales();
+
 ///////////LOGIN///////////
 
 const botonIngresar =
@@ -41,11 +157,10 @@ if (botonIngresar) {
 
 //////////////////EVENTOS DE ADMINISTRADOR//////////////
 
-//==================================================
-// VARIABLES GLOBALES
-//==================================================
+// =========================
+// VARIABLES
+// =========================
 
-// Formulario
 const nombreEvento = document.querySelector("#nombreEvento");
 const artistaEvento = document.querySelector("#artistaEvento");
 const fechaEvento = document.querySelector("#fechaEvento");
@@ -54,93 +169,87 @@ const categoriaEvento = document.querySelector("#categoriaEvento");
 const precioEvento = document.querySelector("#precioEvento");
 const imagenEvento = document.querySelector("#imagenEvento");
 
-// Botones
 const btnGuardarEvento = document.querySelector("#btnGuardarEvento");
-const btnActualizarEvento = document.querySelector("#btnActualizarEvento");
-const btnCancelarEdicion = document.querySelector("#btnCancelarEdicion");
 
-// Dashboard
 const totalEventos = document.querySelector("#totalEventos");
 const eventosPublicados = document.querySelector("#eventosPublicados");
 const eventosVendidos = document.querySelector("#eventosVendidos");
 
-// Lista
 const listaEventos = document.querySelector("#listaEventos");
-const buscarEvento = document.querySelector("#buscarEvento");
 
-// Arreglo donde estarán todos los eventos
-let eventos = JSON.parse(localStorage.getItem("eventos")) || [];
+let eventos =
+    JSON.parse(
+        localStorage.getItem("eventos")
+    ) || [];
 
-// Variables para editar
 let editando = false;
-let idEditar = null;
+let idEditar = -1;
 
-
-//==================================================
-// CARGAR CIUDADES DESDE LA API
-//==================================================
+// =========================
+// CARGAR CIUDADES
+// =========================
 
 async function cargarCiudades() {
 
-    const url = "https://api-colombia.com/api/v1/Department";
-
     try {
 
-        const respuesta = await fetch(url);
-        const ciudades = await respuesta.json();
+        const respuesta = await fetch(
+            "https://api-colombia.com/api/v1/Department"
+        );
 
-        ciudadEvento.innerHTML = "";
+        const ciudades =
+            await respuesta.json();
 
-        const opcionInicial = document.createElement("option");
-        opcionInicial.textContent = "Seleccione una ciudad";
-        opcionInicial.value = "";
+        ciudadEvento.innerHTML =
+            `
+            <option value="">
+                Seleccione una ciudad
+            </option>
+        `;
 
-        ciudadEvento.append(opcionInicial);
+        ciudades.forEach((ciudad) => {
 
-        ciudades.forEach(ciudad => {
-
-            const opcion = document.createElement("option");
-
-            opcion.value = ciudad.name;
-            opcion.textContent = ciudad.name;
-
-            ciudadEvento.append(opcion);
+            ciudadEvento.innerHTML += `
+                <option
+                    value="${ciudad.name || ciudad.nombre}"
+                >
+                    ${ciudad.name || ciudad.nombre}
+                </option>
+            `;
 
         });
 
-    } catch (error) {
+    }
+    catch {
 
-        console.log("Error al cargar ciudades", error);
+        ciudadEvento.innerHTML += `
+            <option>
+                Bogotá
+            </option>
 
+            <option>
+                Medellín
+            </option>
+
+            <option>
+                Cali
+            </option>
+        `;
     }
 
 }
 
-
-//==================================================
-// INICIAR LA PÁGINA
-//==================================================
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    cargarCiudades();
-
-    pintarEventos();
-
-    actualizarDashboard();
-
-});
-
-
-//==================================================
+// =========================
 // GUARDAR EVENTO
-//==================================================
+// =========================
 
-btnGuardarEvento.addEventListener("click", guardarEvento);
+btnGuardarEvento.addEventListener(
+    "click",
+    guardarEvento
+);
 
 function guardarEvento() {
 
-    // Validar campos
     if (
         nombreEvento.value.trim() === "" ||
         artistaEvento.value.trim() === "" ||
@@ -148,58 +257,233 @@ function guardarEvento() {
         ciudadEvento.value === "" ||
         categoriaEvento.value === "" ||
         precioEvento.value === "" ||
-        imagenEvento.value.trim() === ""
+        imagenEvento.files.length === 0
     ) {
-        alert("Completa todos los campos.");
+
+        alert(
+            "Complete todos los campos"
+        );
+
         return;
     }
 
-    // Crear objeto del evento
-    const nuevoEvento = {
+    const archivo =
+        imagenEvento.files[0];
 
-        id: Date.now(),
+    const lector =
+        new FileReader();
 
-        nombre: nombreEvento.value,
+    lector.onload = function () {
 
-        artista: artistaEvento.value,
+        const nuevoEvento = {
 
-        fecha: fechaEvento.value,
+            id: Date.now(),
 
-        ciudad: ciudadEvento.value,
+            nombre:
+                nombreEvento.value,
 
-        categoria: categoriaEvento.value,
+            artista:
+                artistaEvento.value,
 
-        precio: Number(precioEvento.value),
+            fecha:
+                fechaEvento.value,
 
-        imagen: imagenEvento.value,
+            ciudad:
+                ciudadEvento.value,
 
-        vendido: false,
+            categoria:
+                categoriaEvento.value,
 
-        publicado: false
+            precio:
+                Number(
+                    precioEvento.value
+                ),
+
+            imagen:
+                lector.result,
+
+            publicado: true,
+            vendido: false
+        };
+
+        eventos.push(
+            nuevoEvento
+        );
+
+        localStorage.setItem(
+            "eventos",
+            JSON.stringify(eventos)
+        );
+
+        pintarEventos();
+
+        actualizarDashboard();
+
+        limpiarFormulario();
+
+        alert(
+            "Evento creado correctamente"
+        );
 
     };
 
-    // Agregar al arreglo
-    eventos.push(nuevoEvento);
+    lector.readAsDataURL(
+        archivo
+    );
 
-    // Guardar en LocalStorage
+}
+
+// =========================
+// PINTAR EVENTOS
+// =========================
+
+function pintarEventos() {
+
+    listaEventos.innerHTML = "";
+
+    eventos.forEach((evento, i) => {
+
+        listaEventos.innerHTML += `
+
+            <div class="card-evento">
+
+                <img
+                    src="${evento.imagen}"
+                    alt="${evento.nombre}"
+                >
+
+                <div class="card-contenido">
+
+                    <h3>${evento.nombre}</h3>
+
+                    <p>🎤 ${evento.artista}</p>
+
+                    <p>📍 ${evento.ciudad}</p>
+
+                    <p>🎵 ${evento.categoria}</p>
+
+                    <p>📅 ${evento.fecha}</p>
+
+                    <h4>$${evento.precio}</h4>
+
+                    <div class="acciones-card">
+
+                        <button
+                            class="btn-editar"
+                            onclick="editarEvento(${i})"
+                        >
+                            Editar
+                        </button>
+
+                        <button
+                            class="btn-eliminar"
+                            onclick="eliminarEvento(${i})"
+                        >
+                            Eliminar
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `;
+    });
+
+}
+
+// =========================
+// ELIMINAR EVENTO
+// =========================
+
+function eliminarEvento(i) {
+
+    const respuesta = confirm(
+        "¿Desea eliminar este concierto?"
+    );
+
+    if (!respuesta) {
+        return;
+    }
+
+    eventos.splice(i, 1);
+
     localStorage.setItem(
         "eventos",
         JSON.stringify(eventos)
     );
 
-    // Limpiar formulario
-    limpiarFormulario();
-
-    // Actualizar vista
     pintarEventos();
     actualizarDashboard();
 
 }
 
-//==================================================
+
+// =========================
+// EDITAR EVENTO
+// =========================
+
+
+
+function editarEvento(i) {
+
+    const evento = eventos[i];
+
+    nombreEvento.value =
+        evento.nombre;
+
+    artistaEvento.value =
+        evento.artista;
+
+    fechaEvento.value =
+        evento.fecha;
+
+    ciudadEvento.value =
+        evento.ciudad;
+
+    categoriaEvento.value =
+        evento.categoria;
+
+    precioEvento.value =
+        evento.precio;
+
+    editando = true;
+    idEditar = i;
+
+    btnGuardarEvento.textContent =
+        "Actualizar Evento";
+}
+
+
+
+
+// =========================
+// DASHBOARD
+// =========================
+
+function actualizarDashboard() {
+
+    totalEventos.textContent =
+        eventos.length;
+
+    eventosPublicados.textContent =
+        eventos.filter(
+            evento =>
+                evento.publicado
+        ).length;
+
+    eventosVendidos.textContent =
+        eventos.filter(
+            evento =>
+                evento.vendido
+        ).length;
+
+}
+
+// =========================
 // LIMPIAR FORMULARIO
-//==================================================
+// =========================
 
 function limpiarFormulario() {
 
@@ -213,8 +497,23 @@ function limpiarFormulario() {
 
 }
 
-const archivo =
-document.querySelector("#imagenEvento");
+// =========================
+// INICIAR
+// =========================
 
-const imagen =
-archivo.files[0];
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        cargarCiudades();
+
+        pintarEventos();
+
+        actualizarDashboard();
+
+    }
+);
+
+
+
+
